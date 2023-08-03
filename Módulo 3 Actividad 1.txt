@@ -1,0 +1,82 @@
+import math
+
+def hazFactorial(num):
+   
+    '''
+   
+    hazFactorial(x,/)
+        Regresa el factorial de un número entero
+   
+   
+    '''
+   
+    fact = 1
+
+    for i in range(1,num+1):
+        fact = fact * i
+
+    return fact
+   
+
+
+def hazGamma(num):
+    '''
+   
+    hazGamma(x,/)
+        Regresa el valor de la función Gamma de un valor
+   
+   
+    '''
+   
+    return math.gamma(num)
+   
+
+
+def hazDistancia(x2,y2,x1,y1):
+    '''
+   
+    hazDistancia(x2,y2,x1,y1,/)
+        Regresa el valor de la distancia entre dos puntos dadas sus coordenadas
+   
+   
+    '''
+
+    return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
+import ipywidgets as widgets
+from ipywidgets import interact, interactive, fixed, interact_manual
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+
+x = widgets.IntSlider(description = 'x',min= 0, max = 10)
+
+
+def f(x):
+    
+    listx = []
+    listy = []
+    y = math.factorial(x)
+    print('{}!={}'.format(x,y))
+    
+    for i in range (0,x+1):
+        listx.append(i)
+    
+    for j in range (0,x + 1):
+        listy.append(math.factorial(j))
+        
+    
+    #print(listx)
+    #print(listy)
+    plt.ylim(-5,1000000)
+    plt.xlim(-5,10)
+    plt.plot(listx,listy, color = 'green')
+    plt.grid()
+    plt.show()
+    
+   
+  
+
+out = widgets.interactive_output(f, {'x': x})
+
+widgets.HBox([widgets.VBox([x]), out])
