@@ -43,289 +43,289 @@ El radar se puede emplear en diversas asignaturas, Matemática, Estadística, In
 
 Código:
 ################################################################################
-##Autor Plata Luna Iveth Vanessa
-##Importamos la librería para el uso del puerto serial y time par el menejo del tiempo.
-import serial
-import time
-
-##El programa se conecta al puerto serial COM6 a 9600 baudios dando tiempos de demora para recibir datos.
-serialArduino= serial.Serial("COM6", 9600 )
-time.sleep(1)
-
-#La variable cad almacenará de manera temporal los datos obtenidos del puerto serial.
-cad =""
-
-#Definimos una lista para almacenar los datos del puerto serial. La variable i es de control.
-lista=[]
-i = 0
-
-#Segmento de código que obtiene datos desde el puerto serial y lo transforma a ASCII. El bucle termina hasta que se obtene una 'f'
-while not(cad[0:1] == 'f') :
-    cad = serialArduino.readline().decode('ascii')
+    ##Autor Plata Luna Iveth Vanessa
+    ##Importamos la librería para el uso del puerto serial y time par el menejo del tiempo.
+    import serial
+    import time
+    
+    ##El programa se conecta al puerto serial COM6 a 9600 baudios dando tiempos de demora para recibir datos.
+    serialArduino= serial.Serial("COM6", 9600 )
+    time.sleep(1)
+    
+    #La variable cad almacenará de manera temporal los datos obtenidos del puerto serial.
+    cad =""
+    
+    #Definimos una lista para almacenar los datos del puerto serial. La variable i es de control.
+    lista=[]
+    i = 0
+    
+    #Segmento de código que obtiene datos desde el puerto serial y lo transforma a ASCII. El bucle termina hasta que se obtene una 'f'
+    while not(cad[0:1] == 'f') :
+        cad = serialArduino.readline().decode('ascii')
+        print(cad)
+        if not(cad[0:1] == 'f'):
+            lista.append(cad)
+            i=i+1
+    
     print(cad)
-    if not(cad[0:1] == 'f'):
-        lista.append(cad)
-        i=i+1
-
-print(cad)
-
-print(lista)
-
-print(i)
-
-#La definición de estas listas es para almacenar los datos obtenidos del puerto serial, previamente se decodifican.
-objeto=[]
-distancia=[]
-grados=[]
-
-#Definimos listas que servirán a decodificar la información del puerto serial.
-indexO = []
-indexo= []
-indexD = []
-indexd = []
-indexG = []
-indexg = []
-numDigO = []
-numDigD = []
-numDigG = []
-objetoS=[]
-distanciaS=[]
-gradosS=[]
-
-#Segmento de código que decodifica las cadenas de caracter obtenidas desde el puerto serial.
-#Se utiliza funciones para la manipulación de cadenas, como buscar un caracter y extraer subcadenas. 
-#Los resultados obtenidos se almacenan en listas.
-for n in range(0, len(lista), 1):
-    print(lista[n])
-    cadena=lista[n]
-       
-    indexO.append(cadena.find('R'))
-    indexo.append(cadena.find('r'))
-    indexD.append( cadena.find('D'))
-    indexd.append(cadena.find('d'))
-    indexG.append(cadena.find('G'))
-    indexg.append(cadena.find('g'))
     
-    numDigO.append (indexo[n] - indexO[n] - 1)
-    numDigD.append (indexd[n] - indexD[n] - 1)
-    numDigG.append (indexg[n] - indexG[n] - 1)
+    print(lista)
     
-    objetoS.append(cadena[(indexO[n]+1):(indexO[n]+1+numDigO[n])])
-    distanciaS.append(cadena[(indexD[n]+1):(indexD[n]+1+numDigD[n])])
-    gradosS.append(cadena[(indexG[n]+1):(indexG[n]+1+numDigG[n])])
-
-
-print("índice de caracteres")
-print(indexO)
-print(indexo)
-print(indexD)
-print(indexd)
-print(indexG)
-print(indexg)
-print("Número de dígitos")
-print(numDigO)
-print(numDigD)
-print(numDigG)
-print("Resultados")
-print(objetoS)
-print(distanciaS)
-print(gradosS)
-
-#En este segmento de código se convierten las coordenadas polares a coordenadas cartesianas.
-#Para esta función utilizamos la libreria math.
-import math
-objeto = []
-distancia = []
-grados = []
-
-for n in range(0, len(lista), 1):
+    print(i)
     
-    objeto.append (int (objetoS[n]))
-    distancia.append (int (distanciaS[n]))
-    grados.append(int (gradosS[n]))
-
-x=[]
-y=[]
-for n in range(0, len(lista), 1):
-    x.append(distancia[n] * math.cos(math.radians(grados[n])));
-    y.append(distancia[n] * math.sin(math.radians(grados[n])));
-print(objeto)
-print(distancia)
-print(grados)
-print(x)
-print(y)
-
-#Para graficar utilizamos las librerias mumpy y matplotlib.
-import numpy as np
-import matplotlib.pyplot as plt
-
-#Es importante convertir la lista a un tipo arreglo para poder graficar.
-xnp = np.array(x)
-ynp = np.array(y)
-print(xnp)
-print(ynp)
-
-#Configuración del gráfico
-
-
-fig, ax = plt.subplots(figsize = (20,20))
-
-plt.xlabel("x")
-plt.ylabel("y")
-plt.xlim(-20,20)
-plt.ylim(-20,20)
-plt.title("Radar")
-
-plt.hlines(0,-20,20, color="blue")
-plt.vlines(0,-20,20, color="blue")
-
-for n in range(0, len(lista), 1):
-    plt.plot([0,x[n]],[0,y[n]])
-
-#Configuración del color
-color = np.where((xnp<= 0)  , "red", "blue") 
-color = np.where((ynp <= 0)  , "green", "purple") 
-
-
-plt.scatter(xnp, ynp, c=color, label=color, s=500, marker=r'$\heartsuit$', alpha=0.4 )
-plt.plot(xnp, ynp, linestyle="dotted")
-plt.plot(xnp, ynp, linestyle="dashdot")
-plt.plot(xnp, ynp, linestyle="dashed")
-plt.show()
-
-#En este segmento de código se despliegan los datos obtenidos desde el puerto serial, objeto, grados, distancia.
-#También se imprime las coordenadas cartesianas.
-for n in range(0, len(lista), 1):
-    print("Objeto: " , objeto[n])
-    print("Distancia en la que se encuentra el objeto: ", distancia[n])
-    print("Grados en la que se encuentra el objeto: " , grados[n])
-    print("Coordenadas en el plano cartesiano: [ " , x[n] , " , " , y[n] , " ]")
-    print("\n")
+    #La definición de estas listas es para almacenar los datos obtenidos del puerto serial, previamente se decodifican.
+    objeto=[]
+    distancia=[]
+    grados=[]
     
-
-#Para calcular la distancia entre dos objetos es importante crear todas las posibles combinaciones entre los objetos.
-#Generamos algunas listas para las posibles combinaciones.
-objetos=[]
-combinaciones=[]
-serieObjetos=[]
-
-for n in range(1, len(lista)+1, 1):
-    objetos.append(n)
-
-for m in range(1, len(objetos)+1, 1):
-    for n in range(1, len(objetos)+1, 1):
-        serieObjetos.append(m)    
+    #Definimos listas que servirán a decodificar la información del puerto serial.
+    indexO = []
+    indexo= []
+    indexD = []
+    indexd = []
+    indexG = []
+    indexg = []
+    numDigO = []
+    numDigD = []
+    numDigG = []
+    objetoS=[]
+    distanciaS=[]
+    gradosS=[]
     
-for m in range(1, len(lista)+1, 1):
+    #Segmento de código que decodifica las cadenas de caracter obtenidas desde el puerto serial.
+    #Se utiliza funciones para la manipulación de cadenas, como buscar un caracter y extraer subcadenas. 
+    #Los resultados obtenidos se almacenan en listas.
+    for n in range(0, len(lista), 1):
+        print(lista[n])
+        cadena=lista[n]
+           
+        indexO.append(cadena.find('R'))
+        indexo.append(cadena.find('r'))
+        indexD.append( cadena.find('D'))
+        indexd.append(cadena.find('d'))
+        indexG.append(cadena.find('G'))
+        indexg.append(cadena.find('g'))
+        
+        numDigO.append (indexo[n] - indexO[n] - 1)
+        numDigD.append (indexd[n] - indexD[n] - 1)
+        numDigG.append (indexg[n] - indexG[n] - 1)
+        
+        objetoS.append(cadena[(indexO[n]+1):(indexO[n]+1+numDigO[n])])
+        distanciaS.append(cadena[(indexD[n]+1):(indexD[n]+1+numDigD[n])])
+        gradosS.append(cadena[(indexG[n]+1):(indexG[n]+1+numDigG[n])])
+    
+    
+    print("índice de caracteres")
+    print(indexO)
+    print(indexo)
+    print(indexD)
+    print(indexd)
+    print(indexG)
+    print(indexg)
+    print("Número de dígitos")
+    print(numDigO)
+    print(numDigD)
+    print(numDigG)
+    print("Resultados")
+    print(objetoS)
+    print(distanciaS)
+    print(gradosS)
+    
+    #En este segmento de código se convierten las coordenadas polares a coordenadas cartesianas.
+    #Para esta función utilizamos la libreria math.
+    import math
+    objeto = []
+    distancia = []
+    grados = []
+    
+    for n in range(0, len(lista), 1):
+        
+        objeto.append (int (objetoS[n]))
+        distancia.append (int (distanciaS[n]))
+        grados.append(int (gradosS[n]))
+    
+    x=[]
+    y=[]
+    for n in range(0, len(lista), 1):
+        x.append(distancia[n] * math.cos(math.radians(grados[n])));
+        y.append(distancia[n] * math.sin(math.radians(grados[n])));
+    print(objeto)
+    print(distancia)
+    print(grados)
+    print(x)
+    print(y)
+    
+    #Para graficar utilizamos las librerias mumpy y matplotlib.
+    import numpy as np
+    import matplotlib.pyplot as plt
+    
+    #Es importante convertir la lista a un tipo arreglo para poder graficar.
+    xnp = np.array(x)
+    ynp = np.array(y)
+    print(xnp)
+    print(ynp)
+    
+    #Configuración del gráfico
+    
+    
+    fig, ax = plt.subplots(figsize = (20,20))
+    
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.xlim(-20,20)
+    plt.ylim(-20,20)
+    plt.title("Radar")
+    
+    plt.hlines(0,-20,20, color="blue")
+    plt.vlines(0,-20,20, color="blue")
+    
+    for n in range(0, len(lista), 1):
+        plt.plot([0,x[n]],[0,y[n]])
+    
+    #Configuración del color
+    color = np.where((xnp<= 0)  , "red", "blue") 
+    color = np.where((ynp <= 0)  , "green", "purple") 
+    
+    
+    plt.scatter(xnp, ynp, c=color, label=color, s=500, marker=r'$\heartsuit$', alpha=0.4 )
+    plt.plot(xnp, ynp, linestyle="dotted")
+    plt.plot(xnp, ynp, linestyle="dashdot")
+    plt.plot(xnp, ynp, linestyle="dashed")
+    plt.show()
+    
+    #En este segmento de código se despliegan los datos obtenidos desde el puerto serial, objeto, grados, distancia.
+    #También se imprime las coordenadas cartesianas.
+    for n in range(0, len(lista), 1):
+        print("Objeto: " , objeto[n])
+        print("Distancia en la que se encuentra el objeto: ", distancia[n])
+        print("Grados en la que se encuentra el objeto: " , grados[n])
+        print("Coordenadas en el plano cartesiano: [ " , x[n] , " , " , y[n] , " ]")
+        print("\n")
+        
+    
+    #Para calcular la distancia entre dos objetos es importante crear todas las posibles combinaciones entre los objetos.
+    #Generamos algunas listas para las posibles combinaciones.
+    objetos=[]
+    combinaciones=[]
+    serieObjetos=[]
+    
     for n in range(1, len(lista)+1, 1):
-        combinaciones.append(n)
-
-print("objetos: ",objetos)
-print("Serie objetos: ", serieObjetos)
-print("combinaciones: ",combinaciones)
-
-
-#Para continuar con las posibles combinaciones, llenamos las listas con todas las posibilidades.
-posObjetosXY1=[]
-posObjetosXY2=[]
-combObjetosXY1=[]
-combObjetosXY2=[]
-combX1=[]
-combX2=[]
-combY1=[]
-combY2=[]
-
-
-combDistanciaObjetos=[]
-
-for n in range(0, len(serieObjetos), 1):    
-    print("Objeto: ",serieObjetos[n],"Posición objeto: ", objeto.index(serieObjetos[n]),"Coordenada x: ",x[objeto.index(serieObjetos[n])],"Coordenada y:",y[objeto.index(serieObjetos[n])])
-    posObjetosXY1.append(objeto.index(serieObjetos[n]))
-    combX1.append(x[objeto.index(serieObjetos[n])])    
-    combY1.append(y[objeto.index(serieObjetos[n])])
-combObjetosXY1.append(serieObjetos)
-
-print("\n")
-for m in range(0, len(combinaciones), 1):
-    print("Objeto: ", combinaciones[m],"Posición objeto: ", objeto.index(combinaciones[m]),"Coordenada x: ",x[objeto.index(combinaciones[m])],"Coordenada y:",y[objeto.index(combinaciones[m])])
-    posObjetosXY2.append(objeto.index(combinaciones[m]))
-    combX2.append(x[objeto.index(combinaciones[m])])
-    combY2.append(y[objeto.index(combinaciones[m])])
-combObjetosXY2.append(combinaciones)
-
-print("\n")
-
-print("Combinación objetosXY1 : ",combObjetosXY1)
-print("Posición objetosXY1 : ",posObjetosXY1)
-print("x1:", combX1)
-print("y1:", combY1)
-print("\n")
-
-print("Combinación objetosXY2 : ",combObjetosXY2)
-print("Posición ObjetosXY2: ",posObjetosXY2)
-print("x2:", combX2)
-print("y2:", combY2)
-
-#En este segmento de código se calcula la distancia de todas las posibles combinaciones entre los objetos y
-#se despliegan los resultados.
-print(objetos)
-print(x)
-print(y)
-print("\n")
-print("\n")
-for m in range(0, len(combinaciones), 1):
-    print("\n")
-    print("\n")
-    combDistanciaObjetos.append(float(math.sqrt((combX1[m]-combX2[m])**2+(combY1[m]-combY2[m])**2)))
-    print("Distancia: ", float(math.sqrt((combX1[m]-combX2[m])**2+(combY1[m]-combY2[m])**2)) )
-    print("x1: ",combX1[m]," x2:", combX2[m], )
-    print("y1: ",combY1[m]," y2:",combY2[m])
-    print("\n")
-    print("Objeto: ",serieObjetos[m])
-    print("Posición objeto: ", objeto.index(serieObjetos[m]))
-    print("Coordenada x: ",x[objeto.index(serieObjetos[m])])
-    print("Coordenada y: ",y[objeto.index(serieObjetos[m])])
-    print("\n")
-    print("Objeto: ", combinaciones[m])
-    print("Posición objeto: ", objeto.index(combinaciones[m]))
-    print("Coordenada x: ",x[objeto.index(combinaciones[m])])
-    print("Coordenada y:",y[objeto.index(combinaciones[m])])    
+        objetos.append(n)
     
-print(combDistanciaObjetos)
-print("\n")
-
-
-#Volvemos a graficar.
-
-fig, ax = plt.subplots(figsize = (20,20))
-
-
-
-plt.xlabel("x")
-plt.ylabel("y")
-plt.xlim(-30,30)
-plt.ylim(-30,30)
-plt.title("Radar")
-
-plt.hlines(0,-30,30, color="blue")
-plt.vlines(0,-30,30, color="blue")
-
-for n in range(0, len(lista), 1):
-    plt.plot([0,x[n]],[0,y[n]])
-
-#Configuración del color
-color = np.where((xnp<= 0)  , "red", "blue") 
-color = np.where((ynp <= 0)  , "green", "purple") 
-
-
-plt.scatter(xnp, ynp, c=color, label=color, s=500, marker=r'$\heartsuit$', alpha=0.4 )
-ax.plot(combX1,combY1, marker='*')
-ax.plot(combX2,combY2, marker='*')
-
-
-ax.plot(combX1,combY1, marker='*')
-ax.plot(combX2,combY2, marker='*')
-plt.show()
+    for m in range(1, len(objetos)+1, 1):
+        for n in range(1, len(objetos)+1, 1):
+            serieObjetos.append(m)    
+        
+    for m in range(1, len(lista)+1, 1):
+        for n in range(1, len(lista)+1, 1):
+            combinaciones.append(n)
+    
+    print("objetos: ",objetos)
+    print("Serie objetos: ", serieObjetos)
+    print("combinaciones: ",combinaciones)
+    
+    
+    #Para continuar con las posibles combinaciones, llenamos las listas con todas las posibilidades.
+    posObjetosXY1=[]
+    posObjetosXY2=[]
+    combObjetosXY1=[]
+    combObjetosXY2=[]
+    combX1=[]
+    combX2=[]
+    combY1=[]
+    combY2=[]
+    
+    
+    combDistanciaObjetos=[]
+    
+    for n in range(0, len(serieObjetos), 1):    
+        print("Objeto: ",serieObjetos[n],"Posición objeto: ", objeto.index(serieObjetos[n]),"Coordenada x: ",x[objeto.index(serieObjetos[n])],"Coordenada y:",y[objeto.index(serieObjetos[n])])
+        posObjetosXY1.append(objeto.index(serieObjetos[n]))
+        combX1.append(x[objeto.index(serieObjetos[n])])    
+        combY1.append(y[objeto.index(serieObjetos[n])])
+    combObjetosXY1.append(serieObjetos)
+    
+    print("\n")
+    for m in range(0, len(combinaciones), 1):
+        print("Objeto: ", combinaciones[m],"Posición objeto: ", objeto.index(combinaciones[m]),"Coordenada x: ",x[objeto.index(combinaciones[m])],"Coordenada y:",y[objeto.index(combinaciones[m])])
+        posObjetosXY2.append(objeto.index(combinaciones[m]))
+        combX2.append(x[objeto.index(combinaciones[m])])
+        combY2.append(y[objeto.index(combinaciones[m])])
+    combObjetosXY2.append(combinaciones)
+    
+    print("\n")
+    
+    print("Combinación objetosXY1 : ",combObjetosXY1)
+    print("Posición objetosXY1 : ",posObjetosXY1)
+    print("x1:", combX1)
+    print("y1:", combY1)
+    print("\n")
+    
+    print("Combinación objetosXY2 : ",combObjetosXY2)
+    print("Posición ObjetosXY2: ",posObjetosXY2)
+    print("x2:", combX2)
+    print("y2:", combY2)
+    
+    #En este segmento de código se calcula la distancia de todas las posibles combinaciones entre los objetos y
+    #se despliegan los resultados.
+    print(objetos)
+    print(x)
+    print(y)
+    print("\n")
+    print("\n")
+    for m in range(0, len(combinaciones), 1):
+        print("\n")
+        print("\n")
+        combDistanciaObjetos.append(float(math.sqrt((combX1[m]-combX2[m])**2+(combY1[m]-combY2[m])**2)))
+        print("Distancia: ", float(math.sqrt((combX1[m]-combX2[m])**2+(combY1[m]-combY2[m])**2)) )
+        print("x1: ",combX1[m]," x2:", combX2[m], )
+        print("y1: ",combY1[m]," y2:",combY2[m])
+        print("\n")
+        print("Objeto: ",serieObjetos[m])
+        print("Posición objeto: ", objeto.index(serieObjetos[m]))
+        print("Coordenada x: ",x[objeto.index(serieObjetos[m])])
+        print("Coordenada y: ",y[objeto.index(serieObjetos[m])])
+        print("\n")
+        print("Objeto: ", combinaciones[m])
+        print("Posición objeto: ", objeto.index(combinaciones[m]))
+        print("Coordenada x: ",x[objeto.index(combinaciones[m])])
+        print("Coordenada y:",y[objeto.index(combinaciones[m])])    
+        
+    print(combDistanciaObjetos)
+    print("\n")
+    
+    
+    #Volvemos a graficar.
+    
+    fig, ax = plt.subplots(figsize = (20,20))
+    
+    
+    
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.xlim(-30,30)
+    plt.ylim(-30,30)
+    plt.title("Radar")
+    
+    plt.hlines(0,-30,30, color="blue")
+    plt.vlines(0,-30,30, color="blue")
+    
+    for n in range(0, len(lista), 1):
+        plt.plot([0,x[n]],[0,y[n]])
+    
+    #Configuración del color
+    color = np.where((xnp<= 0)  , "red", "blue") 
+    color = np.where((ynp <= 0)  , "green", "purple") 
+    
+    
+    plt.scatter(xnp, ynp, c=color, label=color, s=500, marker=r'$\heartsuit$', alpha=0.4 )
+    ax.plot(combX1,combY1, marker='*')
+    ax.plot(combX2,combY2, marker='*')
+    
+    
+    ax.plot(combX1,combY1, marker='*')
+    ax.plot(combX2,combY2, marker='*')
+    plt.show()
 ################################################################################
 
 
